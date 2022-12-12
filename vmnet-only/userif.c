@@ -1023,6 +1023,10 @@ VNetUserIfSetUplinkState(VNetPort *port, uint8 linkUp)
    VNet_LinkStateEvent event;
    int retval;
 
+   // Fix spurious network disconnections; see from https://fluentreports.com/blog/?p=717.
+   //
+   if (!linkUp) return 0;
+
    userIf = (VNetUserIF *)port->jack.private;
    hubJack = port->jack.peer;
 
