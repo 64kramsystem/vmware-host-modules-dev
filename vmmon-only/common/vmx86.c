@@ -51,7 +51,7 @@
 #include "x86cpuid_asm.h"
 #if defined(__linux__)
 #if LINUX_VERSION_CODE < KERNEL_VERSION(6, 8, 0)
-#include <asm/timex.h>
+#include <linux/timex.h>
 #else
 #include <linux/timex.h>
 #endif

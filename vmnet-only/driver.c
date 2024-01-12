@@ -284,7 +284,7 @@ VNetRemovePortFromList(const VNetPort *port) // IN: port to remove from list
  *----------------------------------------------------------------------
  */
 
-int
+static int
 vmnet_init_module(void)
 {
    int retval;
@@ -363,7 +363,7 @@ err_proto:
  *----------------------------------------------------------------------
  */
 
-void
+static void
 vmnet_cleanup_module(void)
 {
    unregister_chrdev(VNET_MAJOR_NUMBER, "vmnet");
