@@ -536,6 +536,11 @@ VNetBridgeReceiveFromVNet(VNetJack        *this, // IN: jack
       dev_kfree_skb(skb);
       return;
    }
+   // added line
+   if (!bridge->dev) {
+      dev_kfree_skb(skb);
+      return;
+   }
 
    /*
     * skb might be freed by wireless code, so need to keep
@@ -587,6 +592,15 @@ VNetBridgeReceiveFromVNet(VNetJack        *this, // IN: jack
     */
 
    dev_lock_list();
+   // added line
+   for_each_netdev_rcu(&init_net, dev) {
+      if (MAC_EQ(dest, dev->dev_addr) ||
+          skb->len > dev->mtu + dev->hard_header_len) {
+         continue;
+      }
+      // Your existing code here (for sending down)
+   }
+   dev_unlock_list();
    if (MAC_EQ(dest, dev->dev_addr) ||
        skb->len > dev->mtu + dev->hard_header_len) {
       dev_unlock_list();
@@ -640,7 +654,19 @@ VNetBridgeReceiveFromVNet(VNetJack        *this, // IN: jack
 
 	 clone = skb_get(clone);
 
+    dev_lock_list();
+         for_each_netdev_rcu(&init_net, dev) {
+            if (dev == bridge->dev) {
+               clone->dev = dev;
+               clone->protocol = eth_type_trans(clone, dev);
+               // Your existing code here (for sending up)
+               break;
+            }
+         }
+      dev_unlock_list();
+
 	 clone->dev = dev;
+
 	 clone->protocol = eth_type_trans(clone, dev);
 	 spin_lock_irqsave(&bridge->historyLock, flags);
 	 for (i = 0; i < VNET_BRIDGE_HISTORY; i++) {
